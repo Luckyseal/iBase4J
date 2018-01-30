@@ -20,7 +20,7 @@ angular.module('app')
             errorElement: 'div',
             errorPlacement: function(error, e) {
                 var eleErrContains = e.parents('.tdgroup');
-                if(eleErrContains.length == 0){
+                if(eleErrContains != null && eleErrContains.length == 0){
                     eleErrContains = e.parents('.form-group > div');
                 }
                 eleErrContains.append(error);
@@ -43,7 +43,7 @@ angular.module('app')
                             options.expires = -1;
                         }
                         var expires = '';
-                        if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
+                        if (options && options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
                             var date;
                             if (typeof options.expires == 'number') {
                                 date = new Date();
@@ -84,7 +84,17 @@ angular.module('app')
         	return this.optional(element)||/^[a-zA-Z0-9\u4e00-\u9fa5]*$/.test(value);
         },'只能包含字母、数字和汉字');
         jQuery.validator.addMethod('isPhone',function(value,element){
-        	var mobileRgx = /^1[3-8][0-9]\d{8}$/;
+        	//var mobileRgx = /^1[3-8][0-9]\d{8}$/;
+            /*
+            匹配如下号段
+            中国电信号段
+            133、149、153、173、177、180、181、189、199
+            中国联通号段
+            130、131、132、145、155、156、166、175、176、185、186
+            中国移动号段
+            134(0-8)、135、136、137、138、139、147、150、151、152、157、158、159、178、182、183、184、187、188、198
+             */
+        	var mobileRgx = /^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$/;
         	var telRgx =  /^(\d{3,4}-){0,1}\d{7,9}$/;
         	return this.optional(element)||mobileRgx.test(value)||telRgx.test(value);
         },'请输入正确格式的手机或电话号码');
@@ -146,10 +156,10 @@ angular.module('app')
             return $sce.trustAsHtml(input);
         }
     })
-    .directive('uiNav', ['$timeout', function($timeout) {
+    .directive('uiNav', ['$timeout', function() {
     return {
       restrict: 'AC',
-      link: function(scope, el, attr) {
+      link: function(scope, el) {
         var _window = $(window), 
         _mb = 768, 
         wrap = $('.app-aside'), 
@@ -194,7 +204,7 @@ angular.module('app')
           }
           next.appendTo(wrap);
 
-          next.on('mouseleave.nav', function(e){
+          next.on('mouseleave.nav', function(){
             $(backdrop).remove();
             next.appendTo(_this.parent());
             next.off('mouseleave.nav').css('top', 'auto').css('bottom', 'auto');
@@ -207,7 +217,7 @@ angular.module('app')
 
         });
 
-        wrap.on('mouseleave', function(e){
+        wrap.on('mouseleave', function(){
           next && next.trigger('mouseleave.nav');
           $('> .nav', wrap).remove();
         });
